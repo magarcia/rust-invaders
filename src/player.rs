@@ -1,6 +1,8 @@
 use std::time::Duration;
 
-use crate::{NUM_COLS, NUM_ROWS, frame::Drawable, shot::Shot, invaders::Invaders};
+use crossterm::terminal;
+
+use crate::{frame::Drawable, invaders::Invaders, shot::Shot};
 
 const MAX_SHOTS: usize = 10;
 
@@ -10,11 +12,19 @@ pub struct Player {
     shots: Vec<Shot>,
 }
 
+impl Default for Player {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Player {
     pub fn new() -> Self {
+        let (cols, rows) = terminal::size().unwrap();
+
         Self {
-            x: NUM_COLS / 2,
-            y: NUM_ROWS - 1, 
+            x: (cols / 2).into(),
+            y: (rows - 1).into(),
             shots: Vec::new(),
         }
     }
@@ -26,7 +36,9 @@ impl Player {
     }
 
     pub fn move_right(&mut self) {
-        if self.x < NUM_COLS - 1 {
+        let (cols, _) = terminal::size().unwrap();
+
+        if self.x < (cols - 1).into() {
             self.x += 1;
         }
     }
@@ -50,11 +62,9 @@ impl Player {
     pub fn detect_hits(&mut self, invaders: &mut Invaders) -> bool {
         let mut hit_something = false;
         for shot in self.shots.iter_mut() {
-            if !shot.exploding {
-                if invaders.kill_invader_at(shot.x, shot.y) {
-                    hit_something = true;
-                    shot.explode();
-                }
+            if !shot.exploding && invaders.kill_invader_at(shot.x, shot.y) {
+                hit_something = true;
+                shot.explode();
             }
         }
 

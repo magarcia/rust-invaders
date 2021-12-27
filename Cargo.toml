@@ -9,3 +9,6 @@ edition = "2021"
 crossterm = "0.22.1"
 rusty_audio = "1.2.1"
 rusty_time = "0.11.3"
+
+[dev-dependencies]
+cargo-husky = "1"

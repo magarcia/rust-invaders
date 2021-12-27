@@ -1,7 +1,7 @@
-use std::time::Duration;
-use rusty_time::timer::Timer;
-use crate::frame::Frame;
 use crate::frame::Drawable;
+use crate::frame::Frame;
+use rusty_time::timer::Timer;
+use std::time::Duration;
 
 pub struct Shot {
     pub x: usize,
@@ -42,6 +42,6 @@ impl Shot {
 
 impl Drawable for Shot {
     fn draw(&self, frame: &mut Frame) {
-        frame[self.x][self.y] = if self.exploding { "*" } else { "|" };
+        frame[self.x][self.y] = if self.exploding { "💥" } else { "⦚" };
     }
 }

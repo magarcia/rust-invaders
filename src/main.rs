@@ -9,9 +9,9 @@ use invaders::player::Player;
 use invaders::render;
 use rusty_audio::Audio;
 use std::error::Error;
-use std::{io, thread};
 use std::sync::mpsc;
 use std::time::{Duration, Instant};
+use std::{io, thread};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut audio = Audio::new();
@@ -31,11 +31,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         let mut last_frame = new_frame();
         let mut stdout = io::stdout();
         render::render(&mut stdout, &last_frame, &last_frame, true);
-        loop {
-            let curr_frame = match render_rx.recv() {
-                Ok(x) => x,
-                Err(_) => break,
-            };
+        while let Ok(curr_frame) = render_rx.recv() {
             render::render(&mut stdout, &last_frame, &curr_frame, false);
             last_frame = curr_frame;
         }
@@ -58,17 +54,16 @@ fn main() -> Result<(), Box<dyn Error>> {
                     KeyCode::Esc | KeyCode::Char('q') => {
                         audio.play("lose");
                         break 'gameloop;
-                    },
+                    }
                     KeyCode::Left | KeyCode::Char('h') => player.move_left(),
                     KeyCode::Right | KeyCode::Char('l') => player.move_right(),
                     KeyCode::Char(' ') => {
                         if player.shoot() {
                             audio.play("pew");
                         }
-                    },
+                    }
                     _ => {}
                 }
-
             }
         }
 
@@ -83,10 +78,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         // Draw & Render
         player.draw(&mut curr_frame);
-        invaders.draw(&mut &mut curr_frame);
+        invaders.draw(&mut curr_frame);
         let _ = render_tx.send(curr_frame);
         thread::sleep(Duration::from_millis(1));
-
 
         // Win or lose?
         if invaders.all_killed() {
@@ -98,8 +92,6 @@ fn main() -> Result<(), Box<dyn Error>> {
             break 'gameloop;
         }
     }
-
-   
 
     // Cleanup
     drop(render_tx);

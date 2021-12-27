@@ -1,17 +1,18 @@
-use crate::{NUM_COLS, NUM_ROWS};
+use crossterm::terminal;
 
 pub type Frame = Vec<Vec<&'static str>>;
 
 pub fn new_frame() -> Frame {
-    let mut cols = Vec::with_capacity(NUM_COLS);
-    for _ in 0..NUM_COLS {
-        let mut row = Vec::with_capacity(NUM_ROWS);
-        for _ in 0..NUM_ROWS {
+    let (cols, rows) = terminal::size().unwrap();
+    let mut columns = Vec::with_capacity(cols as usize);
+    for _ in 0..cols.into() {
+        let mut row = Vec::with_capacity(rows as usize);
+        for _ in 0..rows.into() {
             row.push(" ")
         }
-        cols.push(row)
+        columns.push(row)
     }
-    cols
+    columns
 }
 
 pub trait Drawable {
